@@ -1,13 +1,7 @@
 on:
-  push:
-    branches:
-      - main
-
-    paths-ignore:
-      - README.md
-
-  schedule:
-    - cron: '0 0 * * *'
+  # TODO: Uncomment this to run the workflow on a nightly basis.
+  #schedule:
+  #  - cron: '0 0 * * *'
 
   # Allow manually triggered workflows by maintainers without any parameters to
   # trigger a proactive rebuild (e.g. when a new package lands)
@@ -19,27 +13,24 @@ name: Create Release
 concurrency: release
 
 jobs:
-  build:
-    name: Release OCI image
+  release:
+    name: Update workstation configuration
     runs-on: ubuntu-latest
-
-    outputs:
-      image-refs: ${{ steps.emit-refs.outputs.image-refs }}
 
     # https://docs.github.com/en/actions/reference/authentication-in-a-workflow
     permissions:
       id-token: write
-      packages: write
       contents: read
 
     steps:
     - uses: actions/checkout@v3
 
-    - uses: docker/login-action@v2
+    # !! TODO: REPLACE THIS WITH OUTPUT FROM INSTRUCTIONS IN setup/README.md !!
+    - uses: 'google-github-actions/auth@v1'
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        workload_identity_provider: projects/TODO/locations/global/workloadIdentityPools/TODO/providers/TODO
+        service_account: TODO@TODO.iam.gserviceaccount.com
+    # !! TODO: REPLACE THIS WITH OUTPUT FROM INSTRUCTIONS IN setup/README.md !!
 
     - uses: hashicorp/setup-terraform@v2
       with:
@@ -47,6 +38,5 @@ jobs:
         terraform_wrapper: false
 
     - run: |
-        export TF_VAR_target_repository=ghcr.io/${{ github.repository }}
         terraform init
-        terraform apply -auto-approve -target=module.image
+        terraform apply -auto-approve

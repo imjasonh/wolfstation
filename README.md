@@ -24,11 +24,21 @@ export TF_VAR_target_repository=ttl.sh/wolfstation
 terraform apply -target=module.image
 ```
 
+### Automatic Updates
+
+This repo can also be configured to automatically build and deploy new images
+on a nightly cadence.
+
+To set this up, follow instructions in [`setup/README.md`](setup/README.md) and
+update [`.github/workflows/release.yaml`](.github/workflows/release.yaml)
+
 ### Cleanup
 
 Cloud Workstations will stop when not being actively used, but they still
-[cost money](https://cloud.google.com/workstations/pricing/) even when idle. To avoid
-unnecessary costs, you can delete the cluster if you're just experimenting:
+[cost money](https://cloud.google.com/workstations/pricing/) ($.20/hour, or $4.80/day)
+even when the workstation is stopped.
+
+To avoid unnecessary costs, you can delete the cluster if you're just experimenting:
 
 ```shell
 terraform destroy
