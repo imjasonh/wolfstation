@@ -12,17 +12,28 @@ terraform {
   }
 }
 
+provider "google" {
+  project = var.project
+  region  = var.region
+}
+
 provider "apko" {
   extra_repositories = ["https://packages.wolfi.dev/os"]
   extra_keyring      = ["https://packages.wolfi.dev/os/wolfi-signing.rsa.pub"]
-  default_archs      = ["x86_64", "aarch64"]
+  default_archs      = ["x86_64"]
   extra_packages     = ["wolfi-baselayout"]
+}
+
+resource "google_artifact_registry_repository" "repo" {
+  format        = "DOCKER"
+  repository_id = var.name
+  location      = var.region
 }
 
 module "image" {
   source = "./image"
 
-  target_repository = var.target_repository != "" ? var.target_repository : "gcr.io/${var.project}/${var.name}"
+  target_repository = "${var.region}-docker.pkg.dev/${var.project}/${google_artifact_registry_repository.repo.name}/work"
   extra_packages    = var.extra_packages
 }
 

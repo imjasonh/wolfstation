@@ -15,6 +15,8 @@ locals {
     "(echo 'PermitEmptyPasswords yes' > /etc/ssh/sshd_config)",
     "/usr/sbin/sshd",
 
+    # TODO: if docker is installed, start it here.
+
     # Cloud workstations require the container entrypoint to block forever.
     "sleep infinity",
   ]
@@ -23,7 +25,6 @@ locals {
 module "image" {
   source = "chainguard-dev/apko/publisher"
 
-  // TODO: use Artifact Registry, pre-create this repo.
   target_repository = var.target_repository
   config = jsonencode({
     contents = {
@@ -34,6 +35,9 @@ module "image" {
         # This is how Cloud Workstations connects to the container.
         "openssh-server",
       ], var.extra_packages)
+    }
+    accounts = {
+      run-as = 0
     }
     entrypoint = { command = "/bin/sh" }
     cmd        = "-c \"${join(" && ", local.startup_commands)}\""

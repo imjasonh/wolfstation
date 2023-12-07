@@ -37,6 +37,12 @@ variable "running_timeout" {
   default     = "21600s"
 }
 
+variable "extra_roles" {
+  description = "The additional roles to grant to the service account."
+  type        = list(string)
+  default     = []
+}
+
 variable "image" {
   description = "The image to use for the cluster."
 }
