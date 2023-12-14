@@ -27,14 +27,17 @@ variable "disk_gb" {
   default     = 35
 }
 
+// Number of seconds to wait before automatically stopping a workstation after it last received user traffic.
 variable "idle_timeout" {
   description = "The idle timeout for the cluster."
-  default     = "600s"
+  default     = "${10 * 60}s" // 10 minutes
 }
 
+// Number of seconds that a workstation can run until it is automatically shut down.
+// We recommend that workstations be shut down daily to reduce costs and so that security updates can be applied upon restart.
 variable "running_timeout" {
   description = "The running timeout for the cluster."
-  default     = "21600s"
+  default     = "${12 * 60 * 60}s" // 12 hours
 }
 
 variable "extra_packages" {

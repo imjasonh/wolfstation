@@ -5,14 +5,20 @@ SPDX-License-Identifier: Apache-2.0
 
 terraform {
   required_providers {
-    apko   = { source = "chainguard-dev/apko" }
-    cosign = { source = "chainguard-dev/cosign" }
-    oci    = { source = "chainguard-dev/oci" }
-    google = { source = "hashicorp/google-beta" }
+    apko        = { source = "chainguard-dev/apko" }
+    cosign      = { source = "chainguard-dev/cosign" }
+    oci         = { source = "chainguard-dev/oci" }
+    google      = { source = "hashicorp/google" }
+    google-beta = { source = "hashicorp/google-beta" }
   }
 }
 
 provider "google" {
+  project = var.project
+  region  = var.region
+}
+
+provider "google-beta" {
   project = var.project
   region  = var.region
 }

@@ -17,7 +17,6 @@ resource "google_compute_subnetwork" "default" {
 
 resource "google_workstations_workstation_cluster" "default" {
   provider               = google-beta
-  project                = var.project
   workstation_cluster_id = var.name
   network                = google_compute_network.default.id
   subnetwork             = google_compute_subnetwork.default.id
@@ -41,9 +40,16 @@ module "project_iam_bindings" {
   }, { for role in var.extra_roles : role => ["serviceAccount:${google_service_account.workstation.email}"] })
 }
 
+resource "google_service_account_iam_binding" "workstation" {
+  service_account_id = google_service_account.workstation.name
+  role               = "roles/iam.serviceAccountUser"
+  members = [
+    "user:jason@chainguard.dev", // TODO: flag
+  ]
+}
+
 resource "google_workstations_workstation_config" "default" {
   provider               = google-beta
-  project                = var.project
   workstation_config_id  = var.name
   workstation_cluster_id = google_workstations_workstation_cluster.default.workstation_cluster_id
   location               = var.region
@@ -58,6 +64,7 @@ resource "google_workstations_workstation_config" "default" {
       // TODO: make this true and figure out how to give it access to the image.
       disable_public_ip_addresses = false
       service_account             = google_service_account.workstation.email
+      service_account_scopes      = ["https://www.googleapis.com/auth/cloud-platform"]
     }
   }
 
@@ -68,7 +75,6 @@ resource "google_workstations_workstation_config" "default" {
 
 resource "google_workstations_workstation" "default" {
   provider               = google-beta
-  project                = var.project
   workstation_id         = var.name
   workstation_config_id  = google_workstations_workstation_config.default.workstation_config_id
   workstation_cluster_id = google_workstations_workstation_cluster.default.workstation_cluster_id

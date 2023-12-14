@@ -5,17 +5,16 @@ SPDX-License-Identifier: Apache-2.0
 
 locals {
   startup_commands = [
-    # Create a user named "user" with no password and passwordless sudo access.
+    # Create a user named "user" with no password and passwordless doas access.
     "(adduser -D user -s /bin/sh)",
     "passwd -d user",
+    "(echo 'permit nopass user' > /etc/doas.conf)",
 
     # Set up and launch sshd, by setting up the host keys and config that allow for empty passwords.
     "(yes | ssh-keygen -q -f /etc/ssh/ssh_host_rsa_key -t rsa -C 'host' -N '')",
     "mkdir /var/empty",
     "(echo 'PermitEmptyPasswords yes' > /etc/ssh/sshd_config)",
     "/usr/sbin/sshd",
-
-    # TODO: if docker is installed, start it here.
 
     # Cloud workstations require the container entrypoint to block forever.
     "sleep infinity",
@@ -35,9 +34,6 @@ module "image" {
         # This is how Cloud Workstations connects to the container.
         "openssh-server",
       ], var.extra_packages)
-    }
-    accounts = {
-      run-as = 0
     }
     entrypoint = { command = "/bin/sh" }
     cmd        = "-c \"${join(" && ", local.startup_commands)}\""

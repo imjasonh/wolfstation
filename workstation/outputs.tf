@@ -5,14 +5,14 @@ SPDX-License-Identifier: Apache-2.0
 
 output "ssh_command" {
   value = <<EOF
-gcloud beta workstations start \
+gcloud workstations start \
     --project=${var.project} \
     --region=${var.region} \
     --cluster=${var.name} \
     --config=${var.name} \
     ${var.name}
 
-gcloud beta workstations ssh \
+gcloud workstations ssh \
     --project=${var.project} \
     --region=${var.region} \
     --cluster=${var.name} \
@@ -23,7 +23,7 @@ gcloud beta workstations ssh \
 
 output "stop_command" {
   value = <<EOF
-gcloud beta workstations stop \
+gcloud workstations stop \
     --project=${var.project} \
     --region=${var.region} \
     --cluster=${var.name} \
